@@ -26,7 +26,25 @@ class SortHelper:
                     arry[j], arry[j + 1] = arry[j + 1], arry[j]
         return arry
 
+    # Selection Sort (Seçerek Sıralama) algoritması her adımda dizideki en küçük
+    # sayının nerede olduğunu bulur ve onu dizinin başına yerleştirir.
+    # bubble sort algoritmasının iyileştirilmiş biçimi sayılabilir takas işlemi yapmadığı için.
+    # Anca yine iç içe iki for oıluşturulması gerektiğinden;
+    # Zaman karmaşası: O(n2)
+    def selection_sort(self, arry):
+        for i in range(len(arry)):
+            min_idx = i
+            for j in range(min_idx + 1, len(arry)):
+                if arry[j] < arry[min_idx]:
+                    min_idx = j
+
+            arry[i], arry[min_idx] = arry[min_idx], arry[i]
+
+        return arry
+
 
 arry = [10, 7, 8, 9, 1, 5]
+
 # print(SortHelper().quick_sort(arry))
-print(SortHelper().bubble_sort(arry))
+# print(SortHelper().bubble_sort(arry))
+print(SortHelper().selection_sort(arry))
