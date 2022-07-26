@@ -20,4 +20,4 @@ things = [
 
 for key, group in groupby(things, lambda x: x[0]):
     for thing in group:
-        print("A %s is a %s." % (thing[1], key))
+        print("A {} is a {}.".format(thing[1], key))
