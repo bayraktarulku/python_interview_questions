@@ -51,6 +51,7 @@ class PerfectNumber:
 
 
 lst = PerfectNumber().prime()
+perfec_number_list = []
 for n in lst:
     reverse_num = int(str(n)[::-1])
     num_indx = lst.index(n) + 1
@@ -64,4 +65,7 @@ for n in lst:
                 if PerfectNumber().is_palindrome(
                     bin_num
                 ) and PerfectNumber().is_palindrome(bin_num_indx):
-                    print(n)
+                    perfec_number_list.append(n)
+
+
+print(perfec_number_list)
