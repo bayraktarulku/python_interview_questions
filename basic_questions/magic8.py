@@ -1,3 +1,10 @@
+# Magic 8 Ball siyah-beyaz 8-top'a benzeyen içi boş plastik bir küredir.
+# pencere olan yüzü ile cevabı evet/hayır olan sorulara cevap verir.
+# Bu uygulama da sorulan sorulara random evet/hayır temalı cevaplar verir.
+# cevaplar genişletilebilir, bir hafıza yapısı oluşturularak önceki cevap
+# ve sorulara göre farklı cevaplar türetilebilir.
+# https://github.com/bayraktarulku/funny-words reposu ile daha keyifli bir app haline getirilebilir.
+
 import random
 
 answers = [
