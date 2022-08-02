@@ -25,6 +25,16 @@
 | Salt okunur listeler olarak hareket ederler. | Değişken bir liste görevi görürler. |
 | Tuple Kodu Örneği, tup = (1, “a”, “string”, 1 + 2) | Tuple Kodu Örneği, tup = (1, “a”, “string”, 1 + 2)	Liste Kodu Örneği, L = [1, “a”, “string”, 1 + 2]|
 
+** dict: key:value ilişkisine dayanan haritalamadır. Anahtarlar ve değerler arasında bire bir ilişki tanımlamaya yardımcı olur. Anahtarlar tarafından indekslenen tipik bir sözlük, 
+```
+>>> thisdict =  {
+...   "brand": "Ford",
+...   "model": "Mustang",
+...   "year": 1964
+... }
+>>> print(thisdict)
+{'brand': 'Ford', 'model': 'Mustang', 'year': 1964}
+```
 #### Python'ın diğer dillerle karşılaştırılması:
 - Açık kaynak.
 - Öğrenmesi kolay, kodlaması hızlı
@@ -50,6 +60,29 @@
 >>> mytxt = my_function("bu metin tersten yazılacak")
 >>> print(mytxt)
 kacalızay netsret nitem ub
+```
+
+#### Python’da bir nesneyi kopyalama
+Python’da nesneleri kopyalayabilirsiniz, ama hepsini değil.
+```code
+>>> import copy
+>>> old_list = [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
+>>> new_list = copy.copy(old_list)
+>>> print("Old list:", old_list)
+Old list: [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
+>>> print("New list:", new_list)
+New list: [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
+```
+#### Python’da map () işlevi nedir?
+map(func, iter1) şeklinde kullanılır. Bir fonksiyona, bir datanın elemanları sırasıyla gönderilir ve sonucu tek bir obje olarak geri döner.
+```
+>>> def myfunc(a, b):
+...   return a + b
+>>> x = map(myfunc, ('apple', 'banana', 'cherry'), ('orange', 'lemon', 'pineapple'))
+>>> print(x)
+<map object at 0x7face0a2fb20>
+>>> print(list(x))
+['appleorange', 'bananalemon', 'cherrypineapple']
 ```
 
 #### Break ve continue nedir?
