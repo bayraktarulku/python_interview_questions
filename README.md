@@ -104,6 +104,36 @@ map(func, iter1) şeklinde kullanılır. Bir fonksiyona, bir datanın elemanlar�
 >>> print (type(x))
 <type 'xrange'>
 ```
+
+#### Python `__new__` ve `__init__` kullanımı arasındaki farklar nelerdir?
+##### `__new__`
+- `__new__` metodu, bir sınıfın bir örneği (instance) oluşturulmadan önce çağrılır.
+- `__new__` metodu, genellikle değiştirilmek istenen nesne oluşturma sürecini özelleştirmek için kullanılır.
+- Bu metot, bir sınıfın örneğini oluşturmak için kullanılır ve __init__ metodundan önce çağrılır.
+- Eğer __new__ metodu, `super().__new__(cls)` gibi bir çağrı ile temel sınıfın `__new__` metodunu çağırmazsa, hiçbir örnek oluşturulmaz ve `__init__` metodu hiç çağrılmaz.
+- `__new__` metodu, genellikle sınıfın immutability (değiştirilemezlik) gerektiren durumlarında veya özelleştirilmiş bir veri yapısı kullanmak istediğimizde kullanılır.
+
+##### `__init__`
+- `__init__` metodu, bir sınıfın örneği oluşturulduktan hemen sonra çağrılır.
+- Bu metot, örnek oluşturulduktan sonra örneğe başlangıç değerlerini atamak için kullanılır.
+- `__init__` metodu, bir nesneye erişim elde edildikten sonra çalıştırılan ilk kod bloğudur.
+- Genellikle nesneye özellikler atanması ve başlangıç durumunun ayarlanması için kullanılır.
+
+```
+class MyClass:
+    def __new__(cls, *args, **kwargs):
+        # Özelleştirilmiş nesne oluşturma işlemleri burada yapılabilir.
+        instance = super().__new__(cls)
+        # Gerekirse örneğe başlangıç değerleri atanabilir.
+        return instance
+
+    def __init__(self, *args, **kwargs):
+        # Bu metot, örneğin başlatılması için kullanılabilir.
+        pass
+```
+`__new__` nesnenin oluşturulma sürecini özelleştirmek için kullanılırken, `__init__` oluşturulan nesneye başlangıç değerleri atamak için kullanılır. 
+Normal kullanım durumunda, `__init__` sıklıkla daha çok kullanılır, `__new__` ise nadiren ihtiyaç duyulur.
+
 #### Thread (iş Parçacığı)
 Bir işin eş zamanlı olarak işlenen her bir bölümü (Kodların sırayla satır satır işleme alındığı bölüm.)
 Thread içindeki kodlar sırayla işleme girerler, bir önceki kod satırı çalıştırılmadan bir sonraki çalıştırılmaz. Satırlar birbirlerini beklerler.
