@@ -1,0 +1,123 @@
+import os
+import subprocess
+
+# Proje dizinini oluştur
+PROJECT_NAME = "fastapi_project"
+os.makedirs(PROJECT_NAME, exist_ok=True)
+
+# Dosya içerikleri
+database_content = """from sqlalchemy import create_engine, Column, Integer, String
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker
+
+SQLALCHEMY_DATABASE_URL = "sqlite:///./test.db"
+
+engine = create_engine(SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False})
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+Base = declarative_base()
+"""
+
+models_content = """from sqlalchemy import Column, Integer, String
+from database import Base
+
+class User(Base):
+    __tablename__ = "users"
+
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String, index=True)
+    email = Column(String, unique=True, index=True)
+"""
+
+schemas_content = """from pydantic import BaseModel
+
+class UserBase(BaseModel):
+    name: str
+    email: str
+
+class UserCreate(UserBase):
+    pass
+
+class UserResponse(UserBase):
+    id: int
+    class Config:
+        from_attributes = True
+"""
+
+crud_content = """from sqlalchemy.orm import Session
+from models import User
+from schemas import UserCreate
+
+def create_user(db: Session, user: UserCreate):
+    db_user = User(name=user.name, email=user.email)
+    db.add(db_user)
+    db.commit()
+    db.refresh(db_user)
+    return db_user
+
+def get_users(db: Session):
+    return db.query(User).all()
+
+def get_user(db: Session, user_id: int):
+    return db.query(User).filter(User.id == user_id).first()
+"""
+
+main_content = """from fastapi import FastAPI, Depends
+from sqlalchemy.orm import Session
+from database import SessionLocal, engine, Base
+from models import User
+from schemas import UserCreate, UserResponse
+from crud import create_user, get_users, get_user
+
+app = FastAPI()
+
+Base.metadata.create_all(bind=engine)
+
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
+
+@app.post("/users/", response_model=UserResponse)
+def create_new_user(user: UserCreate, db: Session = Depends(get_db)):
+    return create_user(db, user)
+
+@app.get("/users/", response_model=list[UserResponse])
+def list_users(db: Session = Depends(get_db)):
+    return get_users(db)
+
+@app.get("/users/{user_id}", response_model=UserResponse)
+def user_detail(user_id: int, db: Session = Depends(get_db)):
+    return get_user(db, user_id)
+"""
+
+requirements_content = """fastapi
+uvicorn
+sqlalchemy
+pydantic
+"""
+
+env_content = """DATABASE_URL=sqlite:///./test.db"""
+
+# Dosyaları oluştur
+files = {
+    "database.py": database_content,
+    "models.py": models_content,
+    "schemas.py": schemas_content,
+    "crud.py": crud_content,
+    "main.py": main_content,
+    "requirements.txt": requirements_content,
+    ".env": env_content,
+}
+
+for filename, content in files.items():
+    with open(os.path.join(PROJECT_NAME, filename), "w", encoding="utf-8") as f:
+        f.write(content)
+
+# Gerekli paketleri yükle
+subprocess.run(["pip", "install", "-r", os.path.join(PROJECT_NAME, "requirements.txt")])
+
+print("Proje başarıyla oluşturuldu!")
+print("Uygulamayı başlatmak için aşağıdaki komutu çalıştırın:")
+print(f"cd {PROJECT_NAME} && uvicorn main:app --reload")
